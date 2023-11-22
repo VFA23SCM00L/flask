@@ -146,6 +146,147 @@ def github():
             issues_reponse.append(data)
 
         today = last_month
+    
+        commit_reponse = []
+        today = date.today()
+        # Iterating to get issues for every month for the past 2 months
+        for i in range(2):
+            last_month = today + dateutil.relativedelta.relativedelta(months=-1)
+            query_url = GITHUB_URL + 'repos/' + repo_name + "/commits"
+            search_issues = requests.get(query_url, headers=headers)
+            search_issues = search_issues.json()
+            issues_items = search_issues
+            issues_items = []
+            try:
+                issues_items = search_issues
+            except KeyError:
+                error = {"error": "Data Not Available"}
+                resp = Response(json.dumps(error), mimetype='application/json')
+                resp.status_code = 500
+                break;
+            if issues_items is None:
+                continue
+            for issue in issues_items:
+                label_name = []
+                data = {}
+                current_issue = issue
+                data['number'] = current_issue["sha"]
+                # Get created date of issue
+                data['created_at'] = current_issue['commit']["committer"]["date"][0:10]
+                commit_reponse.append(data)
+
+            today = last_month
+    
+        release_reponse = []
+        today = date.today()
+        # Iterating to get issues for every month for the past 2 months
+        for i in range(2):
+            last_month = today + dateutil.relativedelta.relativedelta(months=-1)
+            query_url = GITHUB_URL + 'repos/' + repo_name + "/releases"
+            search_issues = requests.get(query_url, headers=headers)
+            search_issues = search_issues.json()
+            issues_items = search_issues
+            issues_items = []
+            try:
+                issues_items = search_issues
+            except KeyError:
+                error = {"error": "Data Not Available"}
+                resp = Response(json.dumps(error), mimetype='application/json')
+                resp.status_code = 500
+                break;
+            if issues_items is None:
+                continue
+            for issue in issues_items:
+                label_name = []
+                data = {}
+                current_issue = issue
+                data['number'] = current_issue["id"]
+                # Get created date of issue
+                data['created_at'] = current_issue["created_at"][0:10]
+                release_reponse.append(data)
+
+            today = last_month
+
+        pull_reponse = []
+        today = date.today()
+        # Iterating to get issues for every month for the past 2 months
+        for i in range(2):
+            last_month = today + dateutil.relativedelta.relativedelta(months=-1)
+            query_url = GITHUB_URL + 'repos/' + repo_name + "/pulls"
+            search_issues = requests.get(query_url, headers=headers)
+            search_issues = search_issues.json()
+            issues_items = search_issues
+            issues_items = []
+            try:
+                issues_items = search_issues
+            except KeyError:
+                error = {"error": "Data Not Available"}
+                resp = Response(json.dumps(error), mimetype='application/json')
+                resp.status_code = 500
+                break;
+            if issues_items is None:
+                continue
+            for issue in issues_items:
+                label_name = []
+                data = {}
+                current_issue = issue
+                data['number'] = current_issue["id"]
+                # Get created date of issue
+                data['created_at'] = current_issue["created_at"][0:10]
+                pull_reponse.append(data)
+
+            today = last_month
+
+        forks_response = []
+        # Iterating to get issues for every month for the past 2 months
+        for repo in reponames:
+            today = date.today()
+            count = 0
+            for i in range(2):
+                last_month = today + dateutil.relativedelta.relativedelta(months=-1)
+                query_url = GITHUB_URL + 'repos/' + repo + "/forks?per_page=100&since:" + str(last_month-today)
+                search_issues = requests.get(query_url, headers=headers)
+                search_issues = search_issues.json()
+                issues_items = []
+                try:
+                    issues_items = search_issues
+                except KeyError:
+                    error = {"error": "Data Not Available"}
+                    resp = Response(json.dumps(error), mimetype='application/json')
+                    resp.status_code = 500
+                    break;
+                print(len(issues_items))
+                if len(issues_items)==0:
+                    break
+                count += len(issues_items)
+
+                today = last_month
+            forks_response.append([repo,count])
+
+        stars_response = []
+        # Iterating to get issues for every month for the past 2 months
+        for repo in reponames:
+            today = date.today()
+            count = 0
+            for i in range(2):
+                last_month = today + dateutil.relativedelta.relativedelta(months=-1)
+                query_url = GITHUB_URL + 'repos/' + repo + "/stargazers?per_page=100&created:" + str(last_month) + '..' + str(today)
+                search_issues = requests.get(query_url, headers=headers)
+                search_issues = search_issues.json()
+                issues_items = search_issues
+                issues_items = []
+                try:
+                    issues_items = search_issues
+                except KeyError:
+                    error = {"error": "Data Not Available"}
+                    resp = Response(json.dumps(error), mimetype='application/json')
+                    resp.status_code = 500
+                    break;
+                if issues_items is None:
+                    continue
+                count += len(issues_items)
+                today = last_month
+            stars_response.append([repo,count])
 
     df = pd.DataFrame(issues_reponse)
 
